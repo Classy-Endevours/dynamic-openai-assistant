@@ -52,23 +52,27 @@ export class OpenAIAssistant {
     return this.threadId;
   }
 
-  async createMessage(question: string) {
-    if (!this.threadId) throw new Error("Please specify a thread");
-    await this.openai.beta.threads.messages.create(this.threadId, {
+  async createMessage(
+    question: string,
+    threadId: string,
+    assistant_id: string,
+    sendAll: boolean
+  ) {
+    if (!threadId) throw new Error("Please specify a thread");
+    await this.openai.beta.threads.messages.create(threadId, {
       role: "user",
       content: question,
     });
-    return this.createRun();
+    return this.createRun(threadId, assistant_id, sendAll);
   }
 
-  async createRun() {
-    if (!this.threadId) throw new Error("Please specify a thread");
-    const run = await this.openai.beta.threads.runs.create(this.threadId, {
-      //   assistant_id: this.assistantId,
-      assistant_id: "",
+  async createRun(threadId: string, assistant_id: string, sendAll?: boolean) {
+    if (!threadId) throw new Error("Please specify a thread");
+    const run = await this.openai.beta.threads.runs.create(threadId, {
+      assistant_id,
     });
     let runStatus = await this.openai.beta.threads.runs.retrieve(
-      this.threadId,
+      threadId,
       run.id
     );
 
@@ -77,22 +81,24 @@ export class OpenAIAssistant {
     while (runStatus.status !== "completed") {
       await new Promise((resolve) => setTimeout(resolve, 2000));
       runStatus = await this.openai.beta.threads.runs.retrieve(
-        this.threadId,
+        threadId,
         run.id
       );
     }
     // Get the last assistant message from the messages array
-    const messages = await this.openai.beta.threads.messages.list(
-      this.threadId
-    );
+    const messages = await this.openai.beta.threads.messages.list(threadId);
+    if (sendAll) {
+      return messages;
+    } else {
+      const lastMessageForRun = messages.data
+        .filter(
+          (message) => message.run_id === run.id && message.role === "assistant"
+        )
+        .pop();
+
+      return lastMessageForRun;
+    }
 
     // Find the last message for the current run
-    const lastMessageForRun = messages.data
-      .filter(
-        (message) => message.run_id === run.id && message.role === "assistant"
-      )
-      .pop();
-
-    return lastMessageForRun;
   }
 }

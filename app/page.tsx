@@ -14,8 +14,9 @@ export default function Home() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // Handle form submission logic here
+    console.log({ name, instructions, tools, model });
     try {
-      const response = await axios.post("/api/users", {
+      const response = await axios.post(`/api/users`, {
         name,
         instructions,
         tools,
