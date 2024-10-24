@@ -27,13 +27,14 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { name, instructions, tools, model } = body;
+    const { name, instructions, tools, model, description } = body;
 
     await connectDB();
     const newAssistant = new OpenAIAssistant(API_KEY);
     const assistant = await newAssistant.createAssistant(
       name,
       instructions,
+      description,
       tools,
       model
     );

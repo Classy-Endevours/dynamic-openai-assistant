@@ -34,12 +34,14 @@ export class OpenAIAssistant {
   async createAssistant(
     name: string,
     instructions: string,
+    description: string,
     tools: AssistantTool[],
     model: string
   ) {
     const assistant = await this.openai.beta.assistants.create({
       name,
       instructions,
+      description,
       tools,
       model,
     });
@@ -100,5 +102,9 @@ export class OpenAIAssistant {
     }
 
     // Find the last message for the current run
+  }
+
+  async listMessages(threadId: string) {
+    return await this.openai.beta.threads.messages.list(threadId);
   }
 }

@@ -7,17 +7,14 @@ export async function GET(
   {
     params,
   }: {
-    params: Promise<{ messageId: string; assistantId: string }>;
+    params: Promise<{ threadId: string }>;
   }
 ) {
   try {
     //   await connectDB();
-    const { messageId, assistantId } = await params;
+    const { threadId } = await params;
     const openAIAssistantInstance = new OpenAIAssistant(API_KEY);
-    const messages = await openAIAssistantInstance.createRun(
-      messageId,
-      assistantId
-    );
+    const messages = await openAIAssistantInstance.listMessages(threadId);
     return NextResponse.json({ messages }, { status: 200 });
   } catch (error) {
     console.error(error);
