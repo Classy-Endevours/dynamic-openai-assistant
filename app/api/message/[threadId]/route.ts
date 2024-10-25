@@ -11,7 +11,6 @@ export async function GET(
   }
 ) {
   try {
-    //   await connectDB();
     const { threadId } = await params;
     const openAIAssistantInstance = new OpenAIAssistant(API_KEY);
     const messages = await openAIAssistantInstance.listMessages(threadId);

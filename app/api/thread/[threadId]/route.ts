@@ -17,7 +17,7 @@ export async function GET(
   }
 ) {
   try {
-    // const { threadId } = await params;
+    req.json()
     const { threadId } = await params;
 
     const myThread = await openai.beta.threads.retrieve(threadId);
